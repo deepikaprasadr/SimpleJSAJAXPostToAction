@@ -1,0 +1,44 @@
+﻿@page
+@model SimpleJSAJAXPostToAction.Pages.GetTimeAntiForgeryKeyModel
+@{
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <title>Antiforgerykeytoken</title>
+</head>
+<body>
+    @Html.AntiForgeryToken()
+    <input type="text" id="txtName"/>
+    <input type="button" id="btnGet" value="Get Current Time"/>
+    <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#btnGet").click(function () { 
+                $.ajax({
+                    type: "POST",
+                    url: "/GetTimeAntiForgeryKey?handler=GetTime",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: {"name":$("#txtName").val()},
+                    success:function (response)
+                    {
+                        alert("Hello:" + response.Name + ".\nCurrent Date and Time:" + response.DateTime);
+                    },
+                    failure:function (response){
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+
+        });    
+    </script>
+      
+</body>
+</html>

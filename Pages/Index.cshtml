@@ -1,0 +1,36 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+@*  //kafle.io/tutorials/asp-dot-net/ajax-aspnet-razor-pages *@
+ @Html.AntiForgeryToken()
+<button type="button" id="callAjax">Say Hello</button>
+
+
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+ 
+
+        $("#callAjax").click(function(){
+    $.ajax({
+            type: "POST",
+            url: "/Index?handler=GetAjax",
+            data: { "name": "Mark" },
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: "json",
+            headers:
+            {
+                    "RequestVerificationToken": $('input:hidden[name="__RequestVerificationToken"]').val()
+            },
+            success: function (msg) {
+                console.log(msg);
+        }
+            });
+        });
+    
+    </script>
+}

@@ -1,0 +1,114 @@
+﻿@page
+@model SimpleJSAJAXPostToAction.Pages.ModalPopUpModel
+@using SimpleJSAJAXPostToAction.Models
+@{
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Antiforgerykeytoken</title>
+</head>
+<body>
+    @Html.AntiForgeryToken()
+    <input type="text" id="txtName" />
+    <input type="button" id="btnGet" value="Get Current Time" />
+    <h4>Customers</h4>
+    <hr/>
+    <table class="table table-striped table-bordered" cellpadding="2" cellspacing="2"   id="CustomerGrid">         
+        <thead bgcolor="#375D81" style="color:white">
+        <tr>
+            <th>CustomerID</th>
+            <th>Contact Name</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>+</th>
+        </tr>
+        </thead>
+        @foreach (Customer customer in Model.customerlist)
+        {
+            <tr>
+            <td>@customer.CustomerID</td>
+            <td>@customer.ContactName</td>
+            <td>@customer.City</td>
+            <td>@customer.Country</td>
+                <td><input type="button" id="BtnView" value="View User" /></td>
+            </tr>
+        }
+    </table>
+    <div id="partialModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document"> 
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title">Customer details Form</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal"></button></div>
+        </div>
+    </div> </div>
+
+    <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+    @* <link rel="stylesheet" href=" maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" /> *@
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script type="text/javascript">
+       
+        
+        $(function () {
+            $("#BtnView").click(function () {
+                var customerId = $(this).closest("tr").find("td").eq(0).html();
+                alert(customerId);
+                $.ajax({
+                    type: "POST",
+                    url: "/ModalPopUp?handler=Details",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: { "customerId": customerId },
+                    success: function (response) {
+                        $("#partialModal").find(".modal-body").html(response);
+                        $("#partialModal").modal('show');
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+        
+        
+        
+        
+        $(function () {
+            $("#btnGet").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/GetTimeAntiForgeryKey?handler=GetTime",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: { "name": $("#txtName").val() },
+                    success: function (response) {
+                        alert("Hello:" + response.Name + ".\nCurrent Date and Time:" + response.DateTime);
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>
